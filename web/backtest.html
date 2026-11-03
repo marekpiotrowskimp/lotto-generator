@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lotto · Backtest</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="top">
+  <h1>Lotto <span class="muted">analiza</span></h1>
+  <nav>
+    <a href="index.html">Dashboard</a>
+    <a href="analysis.html">Analiza</a>
+    <a href="backtest.html" class="active">Backtest</a>
+    <a href="generator.html">Generator</a>
+    <a href="roi.html">ROI</a>
+  </nav>
+</header>
+
+<main>
+  <section class="card">
+    <h2>Backtest strategii</h2>
+    <p class="muted small">Przed każdym losowaniem strategia widzi tylko wcześniejsze wyniki i typuje zakłady. Te same zakłady sprawdzamy też na losowaniach symulowanych zgodnie z H0. Strategia jest lepsza od losowości tylko wtedy, gdy trafia częściej niż w 95% symulacji.</p>
+    <form id="form" class="form-grid">
+      <label>Strategia <select id="strategy"></select></label>
+      <div id="params" class="form-grid inner"></div>
+      <label>Zakładów na losowanie <input id="tickets" type="number" min="1" max="50" value="5"></label>
+      <label>Okres
+        <select id="period">
+          <option value="test">test (od 2021): ocena końcowa</option>
+          <option value="train">train (do 2020): dobór parametrów</option>
+        </select>
+      </label>
+      <label>Symulacje H0 <input id="sims" type="number" min="50" max="5000" value="500"></label>
+      <label>Ziarno losowe <input id="seed" type="number" value="1"></label>
+    </form>
+    <p class="muted small" id="strategy-desc"></p>
+    <div class="row">
+      <div class="actions">
+        <button id="run-btn">Uruchom backtest</button>
+        <button id="cmp-btn" class="secondary">Porównaj wszystkie strategie</button>
+      </div>
+      <span class="muted small" id="status"></span>
+    </div>
+  </section>
+
+  <section id="result" hidden>
+    <section class="card verdict" id="verdict">
+      <div class="label muted" id="v-label"></div>
+      <div class="verdict-text" id="v-text"></div>
+      <p class="muted" id="v-sub"></p>
+    </section>
+
+    <section class="tiles" id="kpis"></section>
+
+    <section class="charts">
+      <figure class="card chart-card">
+        <h2>Saldo w czasie</h2>
+        <p class="muted small">Skumulowane wygrane minus koszt zakładów (losowania z danymi o wygranych). Pas: 90% wyników tych samych zakładów na losowaniach symulowanych (H0).</p>
+        <div class="chart-box tall"><canvas id="c-curve" aria-label="Saldo w czasie"></canvas></div>
+      </figure>
+    </section>
+
+    <section class="card">
+      <h2>Trafienia</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Trafienia</th><th class="num">Strategia</th><th class="num">Oczekiwane (H0)</th><th class="num">95% przy H0</th></tr></thead>
+        <tbody id="tiers"></tbody>
+      </table></div>
+    </section>
+
+    <section class="card">
+      <h2>Najlepsze losowania</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Nr</th><th>Data</th><th>Zakład</th><th>Wylosowane</th><th class="num">Trafień</th><th class="num">Wygrana netto</th></tr></thead>
+        <tbody id="best"></tbody>
+      </table></div>
+    </section>
+  </section>
+
+  <section class="card" id="compare" hidden>
+    <h2>Porównanie strategii</h2>
+    <p class="muted small" id="cmp-note"></p>
+    <div class="table-wrap"><table>
+      <thead><tr>
+        <th>Strategia</th><th class="num">Śr. trafień</th><th class="num">95% H0</th><th class="num">p</th>
+        <th class="num">p (Bonferroni)</th><th class="num">≥3 trafienia</th><th class="num">ROI</th><th class="num hide-sm">ROI H0 (mediana)</th><th>Wynik</th>
+      </tr></thead>
+      <tbody id="cmp"></tbody>
+    </table></div>
+  </section>
+</main>
+
+<script src="vendor/chart.umd.min.js"></script>
+<script src="js/common.js"></script>
+<script src="js/backtest.js"></script>
+</body>
+</html>

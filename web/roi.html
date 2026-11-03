@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lotto · ROI i opłacalność</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="top">
+  <h1>Lotto <span class="muted">analiza</span></h1>
+  <nav>
+    <a href="index.html">Dashboard</a>
+    <a href="analysis.html">Analiza</a>
+    <a href="backtest.html">Backtest</a>
+    <a href="generator.html">Generator</a>
+    <a href="roi.html" class="active">ROI</a>
+  </nav>
+</header>
+
+<main>
+  <section class="card verdict" id="verdict">
+    <div class="label muted" id="v-label">Najbliższe losowanie</div>
+    <div class="verdict-text" id="v-text">Wczytywanie…</div>
+    <p class="muted" id="v-sub"></p>
+  </section>
+
+  <section class="tiles" id="kpis"></section>
+
+  <section class="charts">
+    <figure class="card chart-card">
+      <h2>Wartość oczekiwana zakładu a kumulacja</h2>
+      <p class="muted small" id="ev-note"></p>
+      <div class="chart-box tall"><canvas id="c-ev" aria-label="EV zakładu w zależności od kumulacji"></canvas></div>
+    </figure>
+  </section>
+
+  <section class="card">
+    <h2>Kiedy grać: ROI oczekiwane wg progu kumulacji</h2>
+    <p class="muted small" id="grid-note"></p>
+    <div class="filters">
+      <label class="muted small">Okres <select id="g-period"><option value="all">2014–2026 (wszystkie dane o wygranych)</option><option value="test">2021–2026 (test)</option></select></label>
+    </div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Graj, gdy kumulacja ≥</th><th class="num">Losowań</th><th class="num">ROI: zakład losowy</th><th class="num">ROI: niepopularny</th><th class="num hide-sm">Wynik roczny na 1 zakład (niepop.)</th></tr></thead>
+      <tbody id="grid"></tbody>
+    </table></div>
+  </section>
+
+  <section class="card">
+    <h2>Symulator polityki gry</h2>
+    <p class="muted small">Odtwarza grę na prawdziwych losowaniach: strategia typuje bez znajomości przyszłości, wygrane są faktyczne. ROI oczekiwane liczymy z poziomów wygranych w każdym losowaniu; ma mały szum. ROI zrealizowane zależy od kilku rzadkich trafień.</p>
+    <form class="form-grid" id="form">
+      <label>Strategia <select id="strategy"><option value="anti_popular">Niepopularne kombinacje</option><option value="random">Losowa</option><option value="hot">Gorące liczby</option><option value="pairs">Częste pary</option></select></label>
+      <label>Zakładów na losowanie <input id="tickets" type="number" min="1" max="50" value="5"></label>
+      <label>Graj, gdy kumulacja ≥ (mln zł) <input id="minj" type="number" min="0" max="200" step="1" value="15"></label>
+      <label>Budżet miesięczny (zł, puste = bez limitu) <input id="budget" type="number" min="1" step="10" placeholder="bez limitu"></label>
+      <label>Okres <select id="period"><option value="all">2014–2026</option><option value="test">2021–2026 (test)</option></select></label>
+      <label>Lotto Plus (+1 zł) <select id="plus"><option value="0">nie</option><option value="1">tak</option></select></label>
+    </form>
+    <div class="row">
+      <div class="actions"><button id="sim-btn">Symuluj</button></div>
+      <span class="muted small" id="status"></span>
+    </div>
+  </section>
+
+  <section id="sim" hidden>
+    <section class="tiles" id="sim-kpis"></section>
+    <section class="charts">
+      <figure class="card chart-card">
+        <h2>Saldo polityki w czasie</h2>
+        <p class="muted small">Zrealizowane saldo na tle 90% wyników tych samych zakładów na losowaniach symulowanych (H0).</p>
+        <div class="chart-box tall"><canvas id="c-sim" aria-label="Saldo polityki"></canvas></div>
+      </figure>
+    </section>
+    <p class="muted small" id="sim-note"></p>
+  </section>
+</main>
+
+<script src="vendor/chart.umd.min.js"></script>
+<script src="js/common.js"></script>
+<script src="js/roi.js"></script>
+</body>
+</html>

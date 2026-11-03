@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lotto · Analiza H0</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="top">
+  <h1>Lotto <span class="muted">analiza</span></h1>
+  <nav>
+    <a href="index.html">Dashboard</a>
+    <a href="analysis.html" class="active">Analiza</a>
+    <a href="backtest.html">Backtest</a>
+    <a href="generator.html">Generator</a>
+    <a href="roi.html">ROI</a>
+  </nav>
+</header>
+
+<main>
+  <section class="card verdict" id="verdict">
+    <div class="row">
+      <div>
+        <div class="label muted">Werdykt w sprawie H0 (losowania są losowe i niezależne)</div>
+        <div class="verdict-text" id="v-text">Wczytywanie…</div>
+        <p class="muted" id="v-sub"></p>
+      </div>
+      <button id="run-btn">Uruchom analizę</button>
+    </div>
+    <div id="run-progress" hidden>
+      <div class="bar"><div id="run-bar"></div></div>
+      <p class="muted small" id="run-text"></p>
+    </div>
+  </section>
+
+  <section class="tiles" id="kpis"></section>
+
+  <section class="card">
+    <h2>Jak czytać wynik</h2>
+    <p class="muted small" id="v-explain"></p>
+  </section>
+
+  <section class="groups" id="groups"></section>
+
+  <section class="charts">
+    <figure class="card chart-card">
+      <h2>Częstość każdej liczby</h2>
+      <p class="muted small">Pełna historia: o ile odchyleń standardowych (σ) liczba wystąpień różni się od oczekiwanej przy H0. Przy 49 liczbach 2–3 słupki poza pasem ±2σ to norma. Najedź na słupek, by zobaczyć liczbę wystąpień.</p>
+      <div class="chart-box tall"><canvas id="c-freq" aria-label="Częstość liczb 1–49"></canvas></div>
+    </figure>
+    <figure class="card chart-card">
+      <h2>Przerwy między wystąpieniami liczby</h2>
+      <p class="muted small">Ile losowań mija do ponownego pojawienia się liczby. H0: rozkład geometryczny. Ostatni słupek to 40+.</p>
+      <div class="chart-box"><canvas id="c-gaps" aria-label="Rozkład przerw"></canvas></div>
+    </figure>
+    <figure class="card chart-card">
+      <h2>Powtórki z poprzedniego losowania</h2>
+      <p class="muted small">Ile liczb z losowania t padło też w losowaniu t−1.</p>
+      <div class="chart-box"><canvas id="c-repeats" aria-label="Powtórki z poprzedniego losowania"></canvas></div>
+    </figure>
+    <figure class="card chart-card">
+      <h2>Wspólne liczby z losowaniem sprzed k</h2>
+      <p class="muted small">Średnia liczba wspólnych liczb dla odstępu k = 1…20. Pas: 95% przedział przy H0.</p>
+      <div class="chart-box"><canvas id="c-lags" aria-label="Średnia liczba wspólnych liczb wg odstępu"></canvas></div>
+    </figure>
+    <figure class="card chart-card">
+      <h2>Kolejność wypadania kul</h2>
+      <p class="muted small" id="pos-note">Średnia wartość kuli wylosowanej jako 1., 2., … 6. Pas: 95% przedział przy H0 (25).</p>
+      <div class="chart-box"><canvas id="c-pos" aria-label="Średnia wartość kuli wg pozycji"></canvas></div>
+    </figure>
+    <figure class="card chart-card">
+      <h2>Test modelem: wynik vs permutacje</h2>
+      <p class="muted small" id="ml-note"></p>
+      <div class="chart-box"><canvas id="c-ml" aria-label="Rozkład wyniku modelu na permutacjach"></canvas></div>
+    </figure>
+  </section>
+
+  <section class="card">
+    <div class="row">
+      <h2>Wszystkie hipotezy <span class="badge neutral" id="h-count"></span></h2>
+      <div class="filters">
+        <select id="f-group"><option value="">Wszystkie grupy</option></select>
+        <select id="f-show">
+          <option value="all">Wszystkie</option>
+          <option value="p05">p ≤ 0,05 na train</option>
+          <option value="selected">Istotne po korekcie (train)</option>
+        </select>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table class="hyp">
+        <thead><tr>
+          <th>Hipoteza</th><th class="hide-sm">Metoda</th><th class="num">Efekt (train)</th>
+          <th class="num">p train</th><th class="num">q train</th><th class="num">p test</th><th>Werdykt</th>
+        </tr></thead>
+        <tbody id="hyps"></tbody>
+      </table>
+    </div>
+    <p class="muted small">p: wartość p bez korekty. q: po korekcie Benjaminiego–Hochberga na wszystkie hipotezy z train. Potwierdzenie na test wymaga p ≤ α / (liczba hipotez wybranych na train).</p>
+  </section>
+
+  <section class="card">
+    <h2>Moc testów: co protokół jest w stanie wykryć</h2>
+    <p class="muted small">Najmniejszy efekt wykrywany z prawdopodobieństwem 80% (wykrycie na train × potwierdzenie na test). Brak odkrycia znaczy „brak anomalii większej niż ten próg”, a nie „brak anomalii”.</p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Rodzaj anomalii</th><th class="num">Próg (protokół train → test)</th><th class="num hide-sm">Próg (cała historia, 1 test)</th><th class="hide-sm">Miara</th></tr></thead>
+      <tbody id="power"></tbody>
+    </table></div>
+  </section>
+
+  <section class="card">
+    <div class="row">
+      <div>
+        <h2>Walidacja detektorów</h2>
+        <p class="muted small">Czy protokół nie „odkrywa” anomalii w danych losowych i czy wykrywa anomalie wstrzyknięte celowo.</p>
+      </div>
+      <button id="val-btn" class="secondary">Uruchom walidację (~6 min)</button>
+    </div>
+    <div id="val-progress" hidden>
+      <div class="bar"><div id="val-bar"></div></div>
+      <p class="muted small" id="val-text"></p>
+    </div>
+    <div id="validation"><p class="muted">Brak raportu walidacji.</p></div>
+  </section>
+</main>
+
+<script src="vendor/chart.umd.min.js"></script>
+<script src="js/common.js"></script>
+<script src="js/analysis.js"></script>
+</body>
+</html>

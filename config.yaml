@@ -1,0 +1,73 @@
+# Konfiguracja projektu LOTTO.
+# Zasady gry trzymamy tutaj, a nie w kodzie: zmieniają się w czasie (np. 18.08.2026).
+
+game:
+  name: Lotto
+  pool: 49          # liczby 1..49
+  pick: 6           # losowanych liczb
+  draw_days: [tue, thu, sat]
+
+# Historia ceny zakładu Lotto (zł), obowiązuje od podanej daty.
+# Źródło: wynikilotto.net.pl/artykuly/lotto_cennik,94 (do weryfikacji w regulaminie TS).
+ticket_price:
+  - {since: "1995-01-01", price: 0.10}
+  - {since: "1996-08-19", price: 0.20}
+  - {since: "1997-06-30", price: 0.30}
+  - {since: "2000-08-21", price: 1.00}
+  - {since: "2001-01-01", price: 1.25}   # dokładna data w 2001 r. do ustalenia
+  - {since: "2006-08-01", price: 2.00}   # dokładny dzień do ustalenia
+  - {since: "2009-10-01", price: 3.00}   # dokładny dzień do ustalenia
+  - {since: "2026-08-19", price: 5.00}   # zmiana 18.08 po 22:10, czyli po losowaniu z tego dnia
+
+lotto_plus:
+  price: 1.00
+  prize_6: 1000000
+
+# Stała wygrana za 3 trafienia i gwarantowana pula za 6 (od daty).
+fixed_prizes:
+  - {since: "2009-10-01", prize_3: 24, min_jackpot: 2000000}
+  - {since: "2026-08-19", prize_3: 35, min_jackpot: 3000000}   # losowanie 18.08: trójka jeszcze 24 zł (dane)
+
+tax:
+  rate: 0.10
+  threshold: 2280   # podatek od wygranej powyżej tej kwoty
+
+data:
+  db_path: data/lotto.db
+  # Rzeczywista kolejność wypadania kul jest dostępna od tego losowania (10.01.2004).
+  # Wcześniej plik "niesortowany" zawiera liczby posortowane, więc kolejności nie mamy.
+  draw_order_since: 4045
+  # Format 6 z 49 od początku gry; analizy domyślnie od tej daty.
+  analysis_since: "1957-01-27"
+  # Strony losowań w wynikilotto.net.pl mają tabelę wygranych od 2014 r.
+  prizes_since: "2014-01-01"
+
+sources:
+  user_agent: "lotto-local/0.1 (analiza prywatna)"
+  timeout: 60
+  request_delay: 1.0   # sekundy przerwy między stronami losowań (nie obciążamy serwisu)
+  wynikilotto_results: https://www.wynikilotto.net.pl/lotto/wyniki/
+  # Główne źródło: pełna historia (posortowane + kolejność losowania).
+  wynikilotto_sorted: https://www.wynikilotto.net.pl/download/lotto.csv
+  wynikilotto_order: https://www.wynikilotto.net.pl/download/lotto_niesortowane.csv
+  wynikilotto_draw_page: https://www.wynikilotto.net.pl/lotto/wyniki/{slug}/
+  # Źródło kontrolne: archiwum nieistniejącego już mbnet.com.pl (do 09.09.2025).
+  mbnet_archive: https://web.archive.org/web/20250911221616id_/http://www.mbnet.com.pl/dl.txt
+
+# Jawne poprawki danych źródłowych (numer losowania -> pole). Każda z uzasadnieniem.
+corrections:
+  # lotto.csv podaje 10.09.2006 (niedziela); plik niesortowany i archiwum mbnet: 09.09.2006 (sobota).
+  4323: {date: "2006-09-09"}
+
+split:
+  test_since: "2021-01-01"   # train: wcześniejsze losowania, test: od tej daty
+
+server:
+  host: 127.0.0.1
+  port: 8000
+
+analysis:
+  alpha: 0.05            # poziom istotności (po korekcie)
+  mc_sims: 1000          # symulacje Monte Carlo dla testów bez wzoru analitycznego
+  ml_permutations: 200   # permutacje w teście przewidywalności modelem
+  report_path: data/analysis_report.json

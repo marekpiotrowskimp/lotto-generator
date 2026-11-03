@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lotto · Generator kuponów</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="top">
+  <h1>Lotto <span class="muted">analiza</span></h1>
+  <nav>
+    <a href="index.html">Dashboard</a>
+    <a href="analysis.html">Analiza</a>
+    <a href="backtest.html">Backtest</a>
+    <a href="generator.html" class="active">Generator</a>
+    <a href="roi.html">ROI</a>
+  </nav>
+</header>
+
+<main>
+  <section class="card">
+    <h2>Generator kuponów na najbliższe losowanie</h2>
+    <p class="muted small">Żadna strategia nie trafia częściej niż przypadek (strony Analiza i Backtest). Strategia „Niepopularne kombinacje” nie zwiększa szansy, ale przy trafieniu 4–6 dzielisz wygraną z mniejszą liczbą osób.</p>
+    <form id="form" class="form-grid">
+      <label>Strategia <select id="strategy"></select></label>
+      <div id="params" class="form-grid inner"></div>
+      <label id="tickets-label">Liczba zakładów <input id="tickets" type="number" min="1" max="100" value="5"></label>
+      <label>Pokrycie puli (system)
+        <select id="guarantee"><option value="">bez pokrycia: zwykłe zakłady</option></select>
+      </label>
+      <label id="pool-size-label" hidden>Wielkość puli <input id="pool-size" type="number" min="6" max="18" value="10"></label>
+      <label id="pool-label" hidden>Własna pula (opcjonalnie) <input id="pool" type="text" placeholder="np. 3, 11, 19, 28, 36, 40, 44"></label>
+    </form>
+    <p class="muted small" id="strategy-desc"></p>
+    <div class="row">
+      <div class="actions"><button id="gen-btn">Generuj kupon</button></div>
+      <span class="muted small" id="status"></span>
+    </div>
+  </section>
+
+  <section id="result" hidden>
+    <section class="tiles" id="kpis"></section>
+    <section class="card">
+      <div class="row">
+        <h2>Zakłady</h2>
+        <div class="actions">
+          <button class="secondary" id="copy-btn">Kopiuj wszystkie</button>
+          <button class="secondary" id="csv-btn">Pobierz CSV</button>
+        </div>
+      </div>
+      <p class="muted small" id="pool-info"></p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>#</th><th>Liczby</th><th class="num">Rzadziej typowany niż</th><th class="num">Wygrana za 4 (×)</th><th class="num hide-sm">Wygrana za 5 (×)</th></tr></thead>
+        <tbody id="tickets-body"></tbody>
+      </table></div>
+      <p class="muted small">„Rzadziej typowany niż X%”: odsetek wszystkich kombinacji, które gracze typują częściej. Mnożnik: szacowana wygrana przy trafieniu względem przeciętnego zakładu, z modelu sprawdzonego na losowaniach 2021–2026 i ograniczonego do zakresu obserwowanego w danych.</p>
+    </section>
+  </section>
+
+  <section class="card">
+    <h2>Wypełnij kupon na lotto.pl</h2>
+    <p class="muted small">Strona lotto.pl nie pozwala wkleić liczb: zakład wybiera się, klikając kule. Zakładka poniżej klika je za Ciebie w otwartym oknie „Wybierz 6 liczb z 49”. Tylko zaznacza liczby: „Zapisz” i zapłatę robisz sam. Działa w Twojej przeglądarce, nie wysyła nigdzie danych.</p>
+    <ol class="steps">
+      <li><strong>Raz:</strong> przeciągnij ten przycisk na pasek zakładek przeglądarki: <a id="bookmarklet" class="bookmarklet" href="#">Lotto: wypełnij zakład</a> <span class="muted small">(pasek zakładek: Cmd+Shift+B)</span>
+        <div id="bm-hint" class="hint" hidden>Tego przycisku nie klikaj tutaj: <strong>przeciągnij</strong> go myszką na pasek zakładek, a potem klikaj zakładkę na stronie lotto.pl.</div></li>
+      <li>Wygeneruj zakłady powyżej i kliknij <strong>Kopiuj wszystkie</strong> (albo <strong>Kopiuj</strong> przy jednym zakładzie).</li>
+      <li>Na lotto.pl otwórz kupon Lotto i okno wyboru liczb pierwszego zakładu, kliknij zakładkę i wklej (Cmd+V). Wszystkie zakłady wkleja się raz, w jednej linii.</li>
+      <li>Sprawdź zaznaczone kule i kliknij „Zapisz”. Dla kolejnego zakładu otwórz jego okno i kliknij zakładkę ponownie: wypełni następny z listy.</li>
+    </ol>
+    <p class="muted small">Skrypt rozpoznaje siatkę po kulach 1–49, nie po wyglądzie strony, i po zaznaczeniu sprawdza wynik (✔ albo ⚠). Gdy lotto.pl zmieni budowę strony, może przestać działać; wtedy zaznacz liczby ręcznie. Wpisanie pustego tekstu w okienku czyści listę zakładów. Sprawdź też, czy regulamin lotto.pl nie zabrania takich narzędzi.</p>
+  </section>
+
+  <section class="card chart-card">
+    <h2>Popularność liczb wśród graczy</h2>
+    <p class="muted small" id="pop-note">Model z liczby zwycięzców (2014–2026). Pomarańczowe: liczby typowane częściej niż przeciętnie, niebieskie: rzadziej.</p>
+    <div class="chart-box tall"><canvas id="c-pop" aria-label="Popularność liczb 1–49"></canvas></div>
+  </section>
+</main>
+
+<script src="vendor/chart.umd.min.js"></script>
+<script src="js/common.js"></script>
+<script src="js/generator.js"></script>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lotto · Dashboard</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="top">
+  <h1>Lotto <span class="muted">analiza</span></h1>
+  <nav>
+    <a href="index.html" class="active">Dashboard</a>
+    <a href="analysis.html">Analiza</a>
+    <a href="backtest.html">Backtest</a>
+    <a href="generator.html">Generator</a>
+    <a href="roi.html">ROI</a>
+  </nav>
+</header>
+
+<main>
+  <section class="tiles">
+    <div class="tile"><div class="label">Losowań w bazie</div><div class="value" id="t-draws">–</div><div class="sub" id="t-range"></div></div>
+    <div class="tile"><div class="label">Ostatnie losowanie</div><div class="value" id="t-last">–</div><div class="sub" id="t-last-date"></div></div>
+    <div class="tile"><div class="label">Zapowiadana kumulacja</div><div class="value" id="t-jackpot">–</div><div class="sub" id="t-price"></div></div>
+    <div class="tile"><div class="label">Dane dodatkowe</div><div class="value small" id="t-extra">–</div><div class="sub" id="t-extra-sub"></div></div>
+  </section>
+
+  <section class="card">
+    <div class="row">
+      <div>
+        <h2>Synchronizacja</h2>
+        <p class="muted" id="sync-info">Pobiera nowe losowania, kumulację i brakujące wygrane.</p>
+      </div>
+      <button id="sync-btn">Synchronizuj losowania</button>
+    </div>
+    <div id="sync-progress" hidden>
+      <div class="bar"><div id="sync-bar"></div></div>
+      <p class="muted" id="sync-text"></p>
+    </div>
+    <p id="sync-result" class="muted"></p>
+  </section>
+
+  <section class="card">
+    <div class="row">
+      <h2>Ostatnie losowania</h2>
+      <label class="muted">pokaż <select id="limit"><option>10</option><option selected>20</option><option>50</option><option>100</option></select></label>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>Nr</th><th>Data</th><th>Liczby</th><th class="hide-sm">Kolejność kul</th>
+          <th class="num">6</th><th class="num">5</th><th class="num">4</th><th class="num">3</th><th class="num hide-sm">Pula</th>
+        </tr></thead>
+        <tbody id="draws"></tbody>
+      </table>
+    </div>
+    <p class="muted small">W kolumnach 6/5/4/3: liczba zwycięzców i wygrana na osobę. Wygrane są dostępne od 2014 r., kolejność kul od 2004 r.</p>
+  </section>
+
+  <details class="card" id="disputes-card">
+    <summary><h2>Rozbieżności między źródłami <span class="badge" id="disputes-count">0</span></h2></summary>
+    <p class="muted">Losowania, w których archiwum mbnet podaje inne liczby niż źródło główne (wynikilotto.net.pl). W bazie zostaje wersja ze źródła głównego.</p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Nr</th><th>Data</th><th>Źródło główne</th><th>Inne źródło</th></tr></thead>
+      <tbody id="disputes"></tbody>
+    </table></div>
+  </details>
+</main>
+
+<script src="js/common.js"></script>
+<script src="js/dashboard.js"></script>
+</body>
+</html>
